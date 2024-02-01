@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "deployment"
+  namespace: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "app-deployment"
+  template:
+    metadata:
+      labels:
+        app: "app-deployment"
+    spec:
+      containers:
+      - name: "devconnect"
+        image: "me-west1-docker.pkg.dev/eco-tract-407114/shira-repo/chat-app:v0.0.0"

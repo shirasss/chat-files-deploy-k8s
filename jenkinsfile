@@ -32,8 +32,11 @@ pipeline {
                         sh 'chmod u+x ./kubectl'  
                         sh './kubectl get nodes'
                         sh "./kubectl get pods --namespace=production"
-                        sh "./kubectl set image deployment/deployment2 devconnect=chat:$commitHash"
-                        sh "./kubectl rollout status deployment/deployment2 --namespace=production"
+                        // sh "./kubectl set image deployment/deployment2 devconnect=chat:$commitHash"
+                        // sh "./kubectl rollout status deployment/deployment2 --namespace=production"
+                        sh "./kubectl apply -f deploymeny.yaml"
+                        sh "./kubectl apply -f service.yaml"
+
                     }
                 }
             }
