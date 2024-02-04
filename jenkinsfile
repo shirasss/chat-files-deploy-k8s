@@ -1,7 +1,7 @@
 pipeline {
     agent any 
     environment {
-        artifactRegistryImage = "me-west1-docker.pkg.dev/eco-tract-407114/shira-repo/chat-app"
+        artifactRegistryImage = "me-west1-docker.pkg.dev/eco-tract-407114/shira-repo"
     }
     stages {
         stage('Build') {
@@ -18,7 +18,7 @@ pipeline {
                 script {
                     // Use the commit hash as the version tag
                     def commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                    sh "docker tag chat:$commitHash $artifactRegistryImage:$commitHash"
+                    // sh "docker tag chat:$commitHash $artifactRegistryImage:$commitHash"
                     // sh "docker push $artifactRegistryImage:$commitHash"
                 }
             }
@@ -26,17 +26,16 @@ pipeline {
         stage('Integrate Remote k8s with Jenkins ') {
             steps {
                 script {
-                    def commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                    // def commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                     withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: 'sample', contextName: '', credentialsId: 'SECRET_TOKEN', namespace: 'production', serverUrl: 'https://34.165.68.20']]) {
                         sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/v1.20.5/bin/linux/amd64/kubectl"'  
-                        sh 'chmod u+x ./kubectl'  
-                        sh './kubectl get nodes'
-                        sh "./kubectl get pods --namespace=production"
-                        sh "./kubectl set image deployment/deployment0 devconnect=me-west1-docker.pkg.dev/eco-tract-407114/shira-repo/django-app:v2.0.0"
+                        sh 'chmod u+x ./kubectl' 
+                        sh "./kubectl set image deployment/deployment0 devconnect=$artifactRegistryImage/django-app:v2.0.0"
                         sh "./kubectl rollout status deployment/deployment0 --namespace=production"
+                        // sh './kubectl get nodes'
+                        // sh "./kubectl get pods --namespace=production"
                         // sh "./kubectl apply -f deployment.yaml"
                         // sh "./kubectl apply -f service.yaml"
-
                     }
                 }
             }
